@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BrandAI - Your Personal Brand Strategist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --plum:        #3D254D;
+      --plum-mid:    #5a3a70;
+      --lavender:    #876CAB;
+      --orchid:      #9E759E;
+      --powder:      #CCD9D9;
+      --espresso:    #352F36;
+      --lilac-pale:  #f0eaf6;
+      --lilac-soft:  #ddd0ec;
+      --white:       #ffffff;
+      --offwhite:    #faf8fc;
+      --text-dark:   #2a1f33;
+      --text-mid:    #5a4a6a;
+      --text-muted:  #8a7a9a;
+      --border:      #e2d8ee;
+      --red:         #c0392b;
+      --red-light:   #fdf0ee;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--offwhite); color: var(--text-dark); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .navbar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px; font-weight: 900;
+      color: var(--plum); text-decoration: none;
+    }
+    .navbar-brand span { color: var(--lavender); }
+
+    /* ── HAMBURGER BUTTON ── */
+    .hamburger-btn {
+      width: 44px; height: 44px;
+      background: none; border: none;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 5px;
+      padding: 8px;
+      border-radius: 10px;
+      transition: background 0.2s;
+      position: relative;
+      z-index: 310;
+    }
+    .hamburger-btn:hover { background: var(--lilac-pale); }
+
+    .hamburger-btn .bar {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--plum);
+      border-radius: 2px;
+      transform-origin: center;
+      transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+                  opacity 0.25s ease,
+                  width 0.3s ease;
+    }
+
+    /* X state */
+    .hamburger-btn.open .bar:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .hamburger-btn.open .bar:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .hamburger-btn.open .bar:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* ── MENU OVERLAY ── */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(40, 25, 55, 0.45);
+      z-index: 290;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      backdrop-filter: blur(3px);
+    }
+    .menu-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── SIDE PANEL ── */
+    .side-panel {
+      position: fixed;
+      top: 0; right: 0;
+      width: 340px;
+      height: 100vh;
+      background: var(--white);
+      z-index: 300;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow-y: auto;
+      box-shadow: -8px 0 40px rgba(61,37,77,0.18);
+      display: flex; flex-direction: column;
+    }
+    .side-panel.open {
+      transform: translateX(0);
+    }
+
+    .side-panel-header {
+      padding: 22px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0;
+      background: var(--white);
+      z-index: 1;
+    }
+    .side-panel-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 900;
+      color: var(--plum);
+    }
+    .side-panel-logo span { color: var(--lavender); }
+    .side-panel-tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ── NAV MENU ITEMS ── */
+    .menu-items { padding: 16px 0; flex: 1; }
+
+    .menu-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-item:last-child { border-bottom: none; }
+
+    .menu-item-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 18px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: left;
+    }
+    .menu-item-btn:hover { background: var(--lilac-pale); }
+    .menu-item-btn.active { background: var(--lilac-pale); }
+
+    .menu-item-left {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .menu-item-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .icon-about    { background: #ede6f5; }
+    .icon-features { background: #eaf1f1; }
+    .icon-howto    { background: #fef9c3; }
+    .icon-contact  { background: #fdf2f8; }
+    .contact-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; text-decoration: none; transition: background 0.15s; }
+    .contact-link:hover { background: rgba(135,108,171,0.08); }
+    .contact-link-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .contact-link-icon.email-icon { background: #ede6f5; }
+    .contact-link-icon.li-icon    { background: #dbeafe; }
+    .contact-link-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1px; }
+    .contact-link-value { font-size: 13px; color: var(--plum); font-weight: 600; }
+
+    .menu-item-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.3;
+    }
+    .menu-item-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .menu-item-arrow {
+      font-size: 18px;
+      color: var(--lavender);
+      transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      flex-shrink: 0;
+    }
+    .menu-item-btn.active .menu-item-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* ── EXPANDABLE CONTENT ── */
+    .menu-item-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      background: var(--offwhite);
+    }
+    .menu-item-content.expanded {
+      max-height: 600px;
+    }
+    .menu-item-body {
+      padding: 20px 28px 24px;
+    }
+    .menu-item-body p {
+      font-size: 13.5px;
+      color: var(--text-mid);
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+    .menu-item-body p:last-child { margin-bottom: 0; }
+
+    .feature-list {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+    .feature-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--lavender);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .step-list {
+      display: flex; flex-direction: column; gap: 14px;
+      margin: 0; padding: 0; list-style: none;
+    }
+    .step-item {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .step-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--plum);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.7;
+    }
+    .step-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+
+    .built-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--lilac-pale);
+      border: 1px solid var(--lilac-soft);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--plum);
+      margin: 2px;
+    }
+
+    /* ── PANEL FOOTER ── */
+    .side-panel-footer {
+      padding: 20px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--white);
+    }
+    .panel-footer-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .panel-footer-text span { color: var(--plum); font-weight: 700; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--plum);
+      padding: 96px 0 88px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(158,117,158,0.18) 0%, transparent 70%);
+      top: -150px; left: 50%; transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 56px;
+      background: var(--offwhite);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .hero-canvas { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .brand-el { position: absolute; opacity: 0; animation: floatIn 0.8s ease forwards; }
+    .pal { display: flex; gap: 3px; border-radius: 8px; overflow: hidden; }
+    .pal-dot { width: 20px; height: 32px; }
+    .tag-pill { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.85); white-space: nowrap; }
+    .mini-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 10px 14px; min-width: 88px; }
+    .mini-card-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--orchid); line-height: 1; }
+    .mini-card-lbl { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+    .bar-chart { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 10px 12px; display: flex; align-items: flex-end; gap: 5px; height: 58px; }
+    .bar { width: 9px; border-radius: 3px 3px 0 0; background: rgba(158,117,158,0.6); transform-origin: bottom; animation: growBar 1s ease forwards; }
+    .ig-mock { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 7px; width: 76px; }
+    .ig-mock-img { width: 100%; height: 40px; border-radius: 6px; background: linear-gradient(135deg, rgba(158,117,158,0.4), rgba(135,108,171,0.5)); }
+    .ig-mock-line { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); margin-top: 5px; }
+    .ig-mock-line.short { width: 60%; }
+    .type-spec { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 8px 12px; }
+    .type-spec-big { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: rgba(255,255,255,0.9); line-height: 1; }
+    .type-spec-sm { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px; letter-spacing: 1px; text-transform: uppercase; }
+
+    .el-1  { top: 10%;  left: 2%;    animation-delay: 0.1s; }
+    .el-2  { top: 5%;   left: 20%;   animation-delay: 0.3s; }
+    .el-3  { top: 16%;  right: 3%;   animation-delay: 0.2s; }
+    .el-4  { top: 4%;   right: 19%;  animation-delay: 0.5s; }
+    .el-5  { bottom: 20%; left: 1%;  animation-delay: 0.4s; }
+    .el-6  { bottom: 12%; left: 19%; animation-delay: 0.6s; }
+    .el-7  { bottom: 16%; right: 2%; animation-delay: 0.3s; }
+    .el-8  { bottom: 6%;  right: 20%;animation-delay: 0.5s; }
+    .el-9  { top: 44%;  left: 0%;   animation-delay: 0.7s; }
+    .el-10 { top: 44%;  right: 0%;  animation-delay: 0.8s; }
+
+    .float-a { animation: floatIn 0.8s ease forwards, floatA 4s ease-in-out 0.8s infinite !important; }
+    .float-b { animation: floatIn 0.8s ease forwards, floatB 5s ease-in-out 0.8s infinite !important; }
+    .float-c { animation: floatIn 0.8s ease forwards, floatC 3.5s ease-in-out 0.8s infinite !important; }
+
+    @keyframes floatIn { from{opacity:0;transform:translateY(12px) scale(0.93)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes floatA  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes floatB  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)} }
+    @keyframes floatC  { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-6px) rotate(3deg)} }
+    @keyframes growBar { from{transform:scaleY(0)} to{transform:scaleY(1)} }
+
+    .hero-badge { display: inline-block; background: rgba(158,117,158,0.22); color: var(--powder); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 20px; border-radius: 999px; margin-bottom: 30px; font-weight: 600; border: 1px solid rgba(204,217,217,0.2); position: relative; z-index: 2; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(48px, 8vw, 90px); font-weight: 900; color: var(--white); line-height: 1.08; margin-bottom: 20px; letter-spacing: -1px; position: relative; z-index: 2; }
+    .hero h1 em { font-style: italic; color: var(--orchid); }
+    .hero-sub { color: var(--powder); font-size: 18px; font-weight: 300; max-width: 480px; margin: 0 auto 52px; line-height: 1.75; position: relative; z-index: 2; }
+    .hero-sub strong { color: var(--white); font-weight: 500; }
+    .hero-stats { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; position: relative; z-index: 2; }
+    .stat { text-align: center; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--orchid); }
+    .stat-label { font-size: 11px; color: rgba(204,217,217,0.6); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+
+    /* ── FORM ── */
+    .form-section { padding: 72px 0 80px; }
+    .form-card { background: var(--white); border: 1px solid var(--border); border-radius: 24px; padding: 52px; max-width: 840px; margin: 0 auto; box-shadow: 0 8px 40px rgba(61,37,77,0.08); }
+    .form-card-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--plum); margin-bottom: 6px; font-weight: 700; }
+    .form-card-sub { color: var(--text-muted); font-size: 15px; margin-bottom: 40px; }
+    .form-label { color: var(--plum); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; display: block; }
+    .form-control, .form-select { background: var(--lilac-pale) !important; border: 1.5px solid var(--lilac-soft) !important; border-radius: 12px !important; color: var(--text-dark) !important; padding: 13px 16px !important; font-family: 'DM Sans', sans-serif !important; font-size: 14px !important; transition: all 0.2s; }
+    .form-control:focus, .form-select:focus { border-color: var(--lavender) !important; background: var(--white) !important; box-shadow: 0 0 0 3px rgba(135,108,171,0.12) !important; }
+    .form-control::placeholder { color: var(--text-muted) !important; }
+
+    .personality-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .personality-option { display: none; }
+    .personality-label { padding: 9px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+    .personality-label.fun        { background: #fef9c3; color: #713f12; border-color: #fde047; }
+    .personality-label.premium    { background: var(--lilac-pale); color: var(--plum); border-color: var(--lavender); }
+    .personality-label.affordable { background: #dcfce7; color: #14532d; border-color: #86efac; }
+    .personality-label.traditional{ background: #fff7ed; color: #7c2d12; border-color: #fb923c; }
+    .personality-label.modern     { background: #eff6ff; color: #1e3a8a; border-color: #93c5fd; }
+    .personality-option:checked + .personality-label { transform: scale(1.06); box-shadow: 0 4px 16px rgba(61,37,77,0.18); font-weight: 700; border-width: 2px; }
+
+    .budget-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .budget-option { display: none; }
+    .budget-label { padding: 9px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+    .budget-label.b1 { background: #dcfce7; color: #14532d; border-color: #86efac; }
+    .budget-label.b2 { background: var(--lilac-pale); color: var(--plum); border-color: var(--lavender); }
+    .budget-label.b3 { background: #fef9c3; color: #713f12; border-color: #fde047; }
+    .budget-label.b4 { background: #fdf2f8; color: #831843; border-color: #f9a8d4; }
+    .budget-option:checked + .budget-label { transform: scale(1.06); box-shadow: 0 4px 16px rgba(61,37,77,0.18); font-weight: 700; border-width: 2px; }
+
+    .submit-btn { background: var(--plum); color: white; border: none; padding: 16px 52px; font-size: 16px; font-weight: 600; font-family: 'DM Sans', sans-serif; border-radius: 14px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; }
+    .submit-btn:hover { background: var(--plum-mid); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(61,37,77,0.28); }
+
+    .loading { display: none; text-align: center; padding: 32px 0 8px; }
+    .loading-dots span { display: inline-block; width: 9px; height: 9px; background: var(--lavender); border-radius: 50%; margin: 0 4px; animation: bounce 1.2s infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-11px);opacity:1} }
+    .loading p { color: var(--text-muted); font-size: 14px; margin-top: 12px; }
+
+    /* ── RESULTS ── */
+    .results-section { padding: 0 0 100px; }
+    .results-header { text-align: center; padding: 72px 0 56px; background: var(--plum); margin-bottom: 48px; }
+    .results-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(34px,5vw,52px); color: var(--white); margin-bottom: 10px; font-weight: 900; }
+    .results-header h2 em { color: var(--orchid); font-style: italic; }
+    .results-header p { color: var(--powder); font-size: 15px; font-weight: 300; }
+
+    .rcard { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 32px; height: 100%; box-shadow: 0 2px 16px rgba(61,37,77,0.05); transition: box-shadow 0.2s; }
+    .rcard:hover { box-shadow: 0 6px 28px rgba(61,37,77,0.1); }
+
+    .tint-lavender { background: #ede6f5; border-color: #c9b8df; }
+    .tint-powder   { background: #eaf1f1; border-color: #b8cece; }
+    .tint-orchid   { background: #f0e8f0; border-color: #d4b8d4; }
+    .tint-plum     { background: #e8dff0; border-color: #b89fd0; }
+    .tint-plum-deep{ background: #dfd4ed; border-color: #a98dc4; }
+    .tint-powder-deep { background: #ddeaea; border-color: #a3bebe; }
+    .tint-red      { background: var(--red-light); border-color: rgba(192,57,43,0.2); }
+
+    .rcard-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--lavender); font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-left: 3px solid var(--lavender); padding-left: 12px; }
+    .channel-item       { background: rgba(255,255,255,0.7); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.9); border-left: 3px solid var(--lavender); }
+    .content-idea-item  { background: rgba(255,255,255,0.7); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.9); }
+    .social-post        { background: rgba(255,255,255,0.7); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.9); }
+    .comp-item          { background: rgba(255,255,255,0.7); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.9); }
+    .font-display       { background: rgba(255,255,255,0.6); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.9); }
+    .tagline-item       { border-left: 3px solid var(--orchid); padding: 10px 16px; margin-bottom: 10px; color: var(--text-mid); font-style: italic; font-size: 14px; background: rgba(255,255,255,0.6); border-radius: 0 10px 10px 0; line-height: 1.6; }
+    .brand-story-text   { font-size: 15px; color: var(--text-mid); line-height: 2; font-style: italic; background: rgba(255,255,255,0.6); border-radius: 14px; padding: 28px 32px 28px 48px; border-left: 4px solid var(--orchid); position: relative; }
+    .brand-story-text::before { content: '"'; font-size: 80px; color: var(--orchid); position: absolute; top: -10px; left: 12px; font-family: 'Playfair Display', serif; line-height: 1; opacity: 0.35; }
+
+    .name-pill      { display: inline-block; background: rgba(255,255,255,0.75); color: var(--plum); padding: 7px 18px; border-radius: 999px; font-size: 14px; margin: 4px; font-weight: 600; border: 1px solid var(--lilac-soft); }
+    .color-swatch   { width: 54px; height: 54px; border-radius: 12px; flex-shrink: 0; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(61,37,77,0.12); }
+    .color-name     { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    .color-hex      { font-family: monospace; font-size: 12px; color: var(--lavender); letter-spacing: 1px; font-weight: 700; }
+    .color-reason   { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .voice-text     { color: var(--text-mid); font-size: 15px; line-height: 1.9; border-left: 3px solid var(--lavender); padding-left: 18px; margin-bottom: 22px; }
+    .word-tag       { display: inline-block; padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 500; margin: 3px; }
+    .word-use       { background: rgba(255,255,255,0.75); color: var(--plum); border: 1px solid var(--lilac-soft); }
+    .word-avoid     { background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
+    .channel-name   { font-size: 14px; font-weight: 700; color: var(--plum); margin-bottom: 4px; }
+    .channel-why    { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    .channel-tip    { font-size: 13px; color: var(--lavender); font-weight: 600; }
+    .content-idea-title { font-size: 14px; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
+    .content-idea-platform { display: inline-block; font-size: 10px; padding: 3px 12px; border-radius: 999px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .content-idea-platform.ig  { background: #fdf2f8; color: #831843; border: 1px solid #f9a8d4; }
+    .content-idea-platform.wa  { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .content-idea-platform.fb  { background: #eff6ff; color: #1e3a8a; border: 1px solid #93c5fd; }
+    .content-idea-platform.yt  { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+    .content-idea-platform.def { background: var(--lilac-pale); color: var(--plum); border: 1px solid var(--lilac-soft); }
+    .content-idea-desc  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .social-platform    { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--lavender); margin-bottom: 8px; font-weight: 800; }
+    .social-caption     { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
+    .comp-label         { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--lavender); margin-bottom: 8px; font-weight: 800; }
+    .comp-text          { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
+    .mistake-tag        { display: inline-block; background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.2); padding: 5px 14px; border-radius: 999px; font-size: 12px; margin: 3px; font-weight: 600; }
+    .font-type          { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; font-weight: 700; }
+    .font-name          { font-size: 15px; font-weight: 700; color: var(--plum); }
+
+    .action-card  { background: #e8dff0; border: 1.5px solid #b89fd0 !important; }
+    .action-text  { color: var(--text-mid); font-size: 15px; line-height: 2; }
+    .dont-card    { background: var(--red-light); border: 1.5px solid rgba(192,57,43,0.2) !important; }
+    .dont-card .rcard-label { color: var(--red); border-left-color: var(--red); }
+    .dont-text    { color: #7f1d1d; font-size: 14px; line-height: 1.8; }
+
+    .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 56px; }
+    .btn-plum     { background: var(--plum); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-plum:hover { background: var(--plum-mid); transform: translateY(-2px); color: white; box-shadow: 0 8px 24px rgba(61,37,77,0.3); }
+    .btn-outline  { background: transparent; color: var(--plum); border: 2px solid var(--lavender); padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--plum); color: white; border-color: var(--plum); }
+    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-whatsapp:hover { background: #1fb855; transform: translateY(-2px); color: white; }
+
+    .error-box { background: var(--red-light); border: 1px solid rgba(192,57,43,0.25); border-radius: 14px; padding: 16px 20px; color: var(--red); font-size: 14px; margin: 20px auto; max-width: 840px; }
+    .fade-in { animation: fadeIn 0.6s ease forwards; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)} }
+    .section-divider { height: 1px; background: rgba(135,108,171,0.2); margin: 18px 0 26px; }
+    .footer { border-top: 1px solid var(--border); padding: 24px 40px; background: var(--white); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-right { color: var(--text-muted); font-size: 13px; text-align: left; }
+    .footer-right span { color: var(--plum); font-weight: 700; }
+    .footer-dev { display: flex; flex-direction: column; gap: 2px; text-align: right; }
+    .footer-dev-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .footer-dev-name { font-size: 18px; font-weight: 900; color: var(--plum); font-family: 'Playfair Display', serif; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--plum), var(--lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .footer-dev-email { font-size: 12px; color: var(--lavender); text-decoration: none; letter-spacing: 0.2px; }
+    .footer-dev-email:hover { color: var(--plum); text-decoration: underline; }
+    @media (max-width: 560px) { .footer { flex-direction: column; align-items: flex-start; padding: 20px 24px; } .footer-dev { text-align: left; } }
+
+    /* Prevent body scroll when menu open */
+    body.menu-open { overflow: hidden; }
+
+    /* Responsive side panel */
+    @media (max-width: 400px) {
+      .side-panel { width: 100%; }
+      .navbar { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── MENU OVERLAY ── -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+
+<!-- ── SIDE PANEL ── -->
+<div class="side-panel" id="sidePanel">
+  <div class="side-panel-header">
+    <div>
+      <div class="side-panel-logo">Brand<span>AI</span></div>
+      <div class="side-panel-tagline">Free AI Brand Strategist</div>
+    </div>
+  </div>
+
+  <div class="menu-items">
+
+    <!-- ABOUT -->
+    <div class="menu-item">
+      <button class="menu-item-btn" onclick="toggleSection(this, 'about-content')" aria-expanded="false">
+        <div class="menu-item-left">
+          <div class="menu-item-icon icon-about">💜</div>
+          <div>
+            <div class="menu-item-title">About the Project</div>
+            <div class="menu-item-sub">What is BrandAI?</div>
+          </div>
+        </div>
+        <span class="menu-item-arrow">▾</span>
+      </button>
+      <div class="menu-item-content" id="about-content">
+        <div class="menu-item-body">
+          <p><strong>BrandAI</strong> is a free AI-powered brand strategy tool built specifically for small businesses in India. It was developed as a BCA Major Project.</p>
+          <p>Most small business owners cannot afford a professional brand consultant. BrandAI solves this by using the power of <strong>Groq AI (Llama 3.3 70B)</strong> to generate a full, personalized brand strategy in under 15 seconds — completely free.</p>
+          <p>From brand names and colour palettes to social media captions and competitor analysis, BrandAI gives you everything a ₹50,000 consultant would, at zero cost.</p>
+          <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:6px;">
+            <span class="built-badge">🐍 Python & Flask</span>
+            <span class="built-badge">🤖 Groq AI</span>
+            <span class="built-badge">🎨 Bootstrap 5</span>
+            <span class="built-badge">📄 ReportLab PDF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="menu-item">
+      <button class="menu-item-btn" onclick="toggleSection(this, 'features-content')" aria-expanded="false">
+        <div class="menu-item-left">
+          <div class="menu-item-icon icon-features">✨</div>
+          <div>
+            <div class="menu-item-title">Features</div>
+            <div class="menu-item-sub">What you get in your strategy</div>
+          </div>
+        </div>
+        <span class="menu-item-arrow">▾</span>
+      </button>
+      <div class="menu-item-content" id="features-content">
+        <div class="menu-item-body">
+          <ul class="feature-list">
+            <li><div class="feature-dot"></div><span><strong>Brand Name Ideas</strong> — 3 unique, business-specific name suggestions tailored to your industry and city.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Taglines</strong> — 3 catchy taglines that match your brand personality.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Colour Palette</strong> — Primary, secondary and accent colours with psychological reasoning.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Brand Story</strong> — A compelling, emotional first-person brand narrative written for you.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Brand Voice & Tone</strong> — Words to use and words to avoid when communicating with customers.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Content Ideas</strong> — 5 platform-specific social media content ideas ready to post.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Marketing Channels</strong> — Top 3 recommended platforms with actionable tips.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Ready-to-Post Captions</strong> — Instagram, WhatsApp Status & Facebook captions with emojis and hashtags.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Competitor Analysis</strong> — Market gaps, your unique angle, and pricing strategy advice.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Font Pairing & Logo Direction</strong> — Typography suggestions and logo style guidance.</span></li>
+            <li><div class="feature-dot"></div><span><strong>Action Plan</strong> — A personalized step-by-step plan for this week, tailored to your goals.</span></li>
+            <li><div class="feature-dot"></div><span><strong>PDF Brand Kit</strong> — Download your entire strategy as a beautifully formatted PDF.</span></li>
+            <li><div class="feature-dot"></div><span><strong>History</strong> — All your past strategies are saved and accessible anytime.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE -->
+    <div class="menu-item">
+      <button class="menu-item-btn" onclick="toggleSection(this, 'howto-content')" aria-expanded="false">
+        <div class="menu-item-left">
+          <div class="menu-item-icon icon-howto">🚀</div>
+          <div>
+            <div class="menu-item-title">How to Use</div>
+            <div class="menu-item-sub">Get your strategy in 4 steps</div>
+          </div>
+        </div>
+        <span class="menu-item-arrow">▾</span>
+      </button>
+      <div class="menu-item-content" id="howto-content">
+        <div class="menu-item-body">
+          <ol class="step-list">
+            <li class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <strong>Describe your business</strong>
+                Enter your business type (e.g. "Cafe", "Clothing boutique", "Salon") and who your customers are.
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <strong>Set your preferences</strong>
+                Choose your brand personality (Fun, Premium, Traditional…), your monthly marketing budget, and your city.
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <strong>Enter your main goal</strong>
+                What do you want most right now? More walk-in customers? Instagram followers? Online sales? Be specific for the best results.
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <strong>Click Generate & wait ~15 seconds</strong>
+                The AI will craft your complete brand strategy. Scroll through every section, then download your PDF Brand Kit to keep it forever.
+              </div>
+            </li>
+          </ol>
+          <p style="margin-top:16px; padding: 12px 14px; background: rgba(135,108,171,0.1); border-radius: 10px; border-left: 3px solid var(--lavender); font-size: 12.5px;">
+            💡 <strong>Tip:</strong> The more specific your inputs, the more personalised your strategy will be. Instead of "shop", write "handmade jewellery boutique in Pune for women aged 25–40."
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="menu-item">
+      <button class="menu-item-btn" onclick="toggleSection(this, 'contact-content')" aria-expanded="false">
+        <div class="menu-item-left">
+          <div class="menu-item-icon icon-contact">📬</div>
+          <div>
+            <div class="menu-item-title">Contact</div>
+            <div class="menu-item-sub">Get in touch with the developer</div>
+          </div>
+        </div>
+        <span class="menu-item-arrow">▾</span>
+      </button>
+      <div class="menu-item-content" id="contact-content">
+        <div class="menu-item-body">
+          <a href="mailto:richarahman18@gmail.com" class="contact-link">
+            <div class="contact-link-icon email-icon">✉️</div>
+            <div>
+              <div class="contact-link-label">Email</div>
+              <div class="contact-link-value">richarahman18@gmail.com</div>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/richarahman" target="_blank" class="contact-link">
+            <div class="contact-link-icon li-icon">💼</div>
+            <div>
+              <div class="contact-link-label">LinkedIn</div>
+              <div class="contact-link-value">linkedin.com/in/richarahman</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+    <p class="panel-footer-text"><span>BrandAI</span> · BCA Major Project · Free Forever</p>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="navbar-brand">Brand<span>AI</span></a>
+
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-canvas">
+    <div class="brand-el el-1 float-a">
+      <div class="pal">
+        <div class="pal-dot" style="background:#3D254D"></div>
+        <div class="pal-dot" style="background:#876CAB"></div>
+        <div class="pal-dot" style="background:#9E759E"></div>
+        <div class="pal-dot" style="background:#CCD9D9"></div>
+        <div class="pal-dot" style="background:#352F36"></div>
+      </div>
+    </div>
+    <div class="brand-el el-2 float-b"><div class="tag-pill">✦ Brand Strategy</div></div>
+    <div class="brand-el el-3 float-a">
+      <div class="type-spec">
+        <div class="type-spec-big">Aa</div>
+        <div class="type-spec-sm">Typography</div>
+      </div>
+    </div>
+    <div class="brand-el el-4 float-c"><div class="tag-pill">📱 Social Media</div></div>
+    <div class="brand-el el-9 float-b">
+      <div class="mini-card">
+        <div class="mini-card-val">2.4x</div>
+        <div class="mini-card-lbl">Reach Growth</div>
+      </div>
+    </div>
+    <div class="brand-el el-10 float-a">
+      <div class="bar-chart">
+        <div class="bar" style="height:30%;animation-delay:0.9s"></div>
+        <div class="bar" style="height:55%;animation-delay:1.0s"></div>
+        <div class="bar" style="height:45%;animation-delay:1.1s"></div>
+        <div class="bar" style="height:80%;animation-delay:1.2s;background:rgba(158,117,158,0.9)"></div>
+        <div class="bar" style="height:65%;animation-delay:1.3s"></div>
+      </div>
+    </div>
+    <div class="brand-el el-5 float-c"><div class="tag-pill">🎨 Colour Palette</div></div>
+    <div class="brand-el el-6 float-a"><div class="tag-pill">✦ Brand Voice</div></div>
+    <div class="brand-el el-7 float-b">
+      <div class="ig-mock">
+        <div class="ig-mock-img"></div>
+        <div class="ig-mock-line"></div>
+        <div class="ig-mock-line short"></div>
+      </div>
+    </div>
+    <div class="brand-el el-8 float-c"><div class="tag-pill">💡 Content Ideas</div></div>
+  </div>
+
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="hero-badge">✦ Free · Instant · AI-Powered</div>
+    <h1>AI-Powered Brand Strategy<br><em>for Small Businesses</em></h1>
+    <p class="hero-sub"><strong>No consultant. No waiting. No cost.</strong><br>A complete brand identity, built by AI in under 15 seconds.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Strategy Sections</div></div>
+      <div class="stat"><div class="stat-num">Free</div><div class="stat-label">Always</div></div>
+      <div class="stat"><div class="stat-num">15s</div><div class="stat-label">Generation Time</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-section">
+  <div class="container">
+    <div class="form-card">
+      <h4 class="form-card-title">Tell us about your business</h4>
+      <p class="form-card-sub">Fill in the details below and our AI will craft a complete brand strategy for you</p>
+      <form method="POST" onsubmit="showLoading()">
+        <div class="row g-4">
+
+          <div class="col-md-6">
+            <label class="form-label">Business type</label>
+            <input type="text" name="business_type" class="form-control" placeholder="e.g. Cafe, Salon, Clothing shop" required value="{{ form.business_type or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Target audience</label>
+            <input type="text" name="audience" class="form-control" placeholder="e.g. College students aged 18-25" required value="{{ form.audience or '' }}">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Brand personality</label>
+            <div class="personality-group">
+              <input type="radio" name="personality" id="p1" value="Fun and energetic" class="personality-option" {% if form.personality == 'Fun and energetic' or not form.personality %}checked{% endif %}>
+              <label for="p1" class="personality-label fun">😄 Fun & Energetic</label>
+              <input type="radio" name="personality" id="p2" value="Premium and luxury" class="personality-option" {% if form.personality == 'Premium and luxury' %}checked{% endif %}>
+              <label for="p2" class="personality-label premium">💎 Premium & Luxury</label>
+              <input type="radio" name="personality" id="p3" value="Affordable and friendly" class="personality-option" {% if form.personality == 'Affordable and friendly' %}checked{% endif %}>
+              <label for="p3" class="personality-label affordable">🤝 Affordable & Friendly</label>
+              <input type="radio" name="personality" id="p4" value="Traditional and trustworthy" class="personality-option" {% if form.personality == 'Traditional and trustworthy' %}checked{% endif %}>
+              <label for="p4" class="personality-label traditional">🏛️ Traditional & Trustworthy</label>
+              <input type="radio" name="personality" id="p5" value="Modern and minimal" class="personality-option" {% if form.personality == 'Modern and minimal' %}checked{% endif %}>
+              <label for="p5" class="personality-label modern">✦ Modern & Minimal</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Monthly budget</label>
+            <div class="budget-group">
+              <input type="radio" name="budget" id="b1" value="Under 5,000" class="budget-option" {% if form.budget == 'Under 5,000' or not form.budget %}checked{% endif %}>
+              <label for="b1" class="budget-label b1">Under ₹5K</label>
+              <input type="radio" name="budget" id="b2" value="5,000 - 15,000" class="budget-option" {% if form.budget == '5,000 - 15,000' %}checked{% endif %}>
+              <label for="b2" class="budget-label b2">₹5K – 15K</label>
+              <input type="radio" name="budget" id="b3" value="15,000 - 50,000" class="budget-option" {% if form.budget == '15,000 - 50,000' %}checked{% endif %}>
+              <label for="b3" class="budget-label b3">₹15K – 50K</label>
+              <input type="radio" name="budget" id="b4" value="Above 50,000" class="budget-option" {% if form.budget == 'Above 50,000' %}checked{% endif %}>
+              <label for="b4" class="budget-label b4">Above ₹50K</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">City</label>
+            <input type="text" name="city" class="form-control" placeholder="e.g. Mumbai, Nashik, Pune" value="{{ form.city or '' }}">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Main business goal</label>
+            <input type="text" name="goal" class="form-control" placeholder="e.g. Get more walk-in customers, build Instagram following" value="{{ form.goal or '' }}">
+          </div>
+
+          <div class="col-12 text-center mt-2">
+            <button type="submit" class="submit-btn">Generate My Brand Strategy →</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="loading" id="loadingDiv">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <p>AI is crafting your brand strategy — takes about 15 seconds ✨</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if error %}
+<div class="container"><div class="error-box">⚠️ {{ error }}</div></div>
+{% endif %}
+
+{% if result %}
+<div id="results" class="fade-in results-section">
+
+  <div class="results-header">
+    <div class="container">
+      <h2>Your Brand Strategy is <em>Ready</em> ✦</h2>
+      <p>Generated specifically for your {{ form.business_type }} in {{ form.city }}</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-md-6">
+        <div class="rcard tint-lavender">
+          <div class="rcard-label">✦ Brand name ideas</div>
+          <div class="mb-4">
+            {% for name in result.brand_name_ideas %}
+            <span class="name-pill">{{ name }}</span>
+            {% endfor %}
+          </div>
+          <div class="section-divider"></div>
+          <div class="rcard-label">✦ Taglines</div>
+          {% for t in result.taglines %}
+          <div class="tagline-item">"{{ t }}"</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="rcard tint-powder">
+          <div class="rcard-label">✦ Colour palette</div>
+          {% for c in result.colors %}
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="color-swatch" style="background:{{ c.hex }}"></div>
+            <div>
+              <div class="color-name">{{ c.name }}</div>
+              <div class="color-hex">{{ c.hex }}</div>
+              <div class="color-reason">{{ c.reason }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="rcard tint-orchid">
+          <div class="rcard-label">✦ Brand story</div>
+          <div class="brand-story-text">{{ result.brand_story }}</div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="rcard tint-plum">
+          <div class="rcard-label">✦ Brand voice & tone</div>
+          <p class="voice-text">{{ result.brand_voice }}</p>
+          <div class="row">
+            <div class="col-md-6">
+              <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);font-weight:800;margin-bottom:12px">✓ Use these words</div>
+              {% for w in result.words_to_use %}<span class="word-tag word-use">{{ w }}</span>{% endfor %}
+            </div>
+            <div class="col-md-6 mt-3 mt-md-0">
+              <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);font-weight:800;margin-bottom:12px">✗ Avoid these words</div>
+              {% for w in result.words_to_avoid %}<span class="word-tag word-avoid">{{ w }}</span>{% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="rcard tint-lavender">
+          <div class="rcard-label">✦ Content ideas for social media</div>
+          <div class="row g-3">
+            {% for idea in result.content_ideas %}
+            <div class="col-md-6">
+              <div class="content-idea-item">
+                {% if idea.platform == 'Instagram' %}
+                <div class="content-idea-platform ig">{{ idea.platform }}</div>
+                {% elif idea.platform == 'WhatsApp' %}
+                <div class="content-idea-platform wa">{{ idea.platform }}</div>
+                {% elif idea.platform == 'Facebook' %}
+                <div class="content-idea-platform fb">{{ idea.platform }}</div>
+                {% elif idea.platform == 'YouTube' %}
+                <div class="content-idea-platform yt">{{ idea.platform }}</div>
+                {% else %}
+                <div class="content-idea-platform def">{{ idea.platform }}</div>
+                {% endif %}
+                <div class="content-idea-title">{{ idea.title }}</div>
+                <div class="content-idea-desc">{{ idea.description }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="rcard tint-orchid">
+          <div class="rcard-label">✦ Marketing channels</div>
+          {% for ch in result.marketing_channels %}
+          <div class="channel-item">
+            <div class="channel-name">{{ ch.channel }}</div>
+            <div class="channel-why">{{ ch.why }}</div>
+            <div class="channel-tip">→ {{ ch.tip }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="rcard tint-plum-deep">
+          <div class="rcard-label">✦ Ready-to-post captions</div>
+          {% for post in result.social_posts %}
+          <div class="social-post">
+            <div class="social-platform">{{ post.platform }}</div>
+            <div class="social-caption">{{ post.caption }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="rcard tint-powder-deep">
+          <div class="rcard-label">✦ Competitor analysis</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="comp-item">
+                <div class="comp-label">Common mistakes in your industry</div>
+                {% for m in result.competitor_analysis.common_mistakes %}
+                <span class="mistake-tag">{{ m }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="comp-item">
+                <div class="comp-label">Market gap you can fill</div>
+                <div class="comp-text">{{ result.competitor_analysis.gap_opportunity }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="comp-item">
+                <div class="comp-label">Your unique angle</div>
+                <div class="comp-text">{{ result.competitor_analysis.unique_angle }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="comp-item">
+                <div class="comp-label">Pricing strategy tip</div>
+                <div class="comp-text">{{ result.competitor_analysis.pricing_tip }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="rcard tint-lavender">
+          <div class="rcard-label">✦ Font pairing</div>
+          <div class="font-display">
+            <div class="font-type">Heading font</div>
+            <div class="font-name">{{ result.fonts.heading }}</div>
+          </div>
+          <div class="font-display">
+            <div class="font-type">Body font</div>
+            <div class="font-name">{{ result.fonts.body }}</div>
+          </div>
+          <div class="rcard-label mt-3">✦ Logo style direction</div>
+          <p style="color:var(--text-mid);font-size:14px;line-height:1.7;">{{ result.logo_style }}</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="rcard dont-card">
+          <div class="rcard-label">⚠ What NOT to do</div>
+          <p class="dont-text">{{ result.dont_do }}</p>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="rcard action-card">
+          <div class="rcard-label">🚀 Your personalized action plan</div>
+          <p class="action-text">{{ result.action_plan }}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="action-buttons">
+      <form method="POST" action="/download-pdf" style="display:inline">
+        <input type="hidden" name="form_data" value='{{ form | tojson }}'>
+        <input type="hidden" name="result_data" value='{{ result | tojson }}'>
+        <button type="submit" class="btn-plum">⬇️ Download PDF Brand Kit</button>
+      </form>
+      <a href="https://wa.me/?text={{ ('Check out BrandAI - Free AI Brand Strategy for small businesses! ' + request.url_root) | urlencode }}" target="_blank" class="btn-whatsapp">💬 Share on WhatsApp</a>
+      <a href="/" class="btn-outline">← Try another business</a>
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+<div class="footer">
+  <div class="footer-right">
+    <span>BrandAI</span> — Built with Python, Flask &amp; Groq AI &nbsp;·&nbsp; BCA Major Project
+  </div>
+  <div class="footer-dev">
+    <div class="footer-dev-label">Developer</div>
+    <div class="footer-dev-name">Richa Rahman</div>
+    <a href="mailto:richarahman18@gmail.com" class="footer-dev-email">richarahman18@gmail.com</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ── HAMBURGER MENU ── */
+  var menuOpen = false;
+
+  function toggleMenu() {
+    menuOpen ? closeMenu() : openMenu();
+  }
+
+  function openMenu() {
+    menuOpen = true;
+    document.getElementById('hamburgerBtn').classList.add('open');
+    document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'true');
+    document.getElementById('sidePanel').classList.add('open');
+    document.getElementById('menuOverlay').classList.add('visible');
+    document.body.classList.add('menu-open');
+  }
+
+  function closeMenu() {
+    menuOpen = false;
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');
+    document.getElementById('sidePanel').classList.remove('open');
+    document.getElementById('menuOverlay').classList.remove('visible');
+    document.body.classList.remove('menu-open');
+  }
+
+  /* ── ACCORDION SECTIONS ── */
+  function toggleSection(btn, contentId) {
+    var content = document.getElementById(contentId);
+    var isActive = btn.classList.contains('active');
+
+    /* Close all other open sections */
+    document.querySelectorAll('.menu-item-btn.active').forEach(function(b) {
+      b.classList.remove('active');
+      b.setAttribute('aria-expanded', 'false');
+    });
+    document.querySelectorAll('.menu-item-content.expanded').forEach(function(c) {
+      c.classList.remove('expanded');
+    });
+
+    /* Toggle clicked one */
+    if (!isActive) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-expanded', 'true');
+      content.classList.add('expanded');
+    }
+  }
+
+  /* ── Keyboard: Escape closes menu ── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && menuOpen) closeMenu();
+  });
+
+  /* ── Form loading ── */
+  function showLoading() {
+    document.getElementById('loadingDiv').style.display = 'block';
+  }
+
+  /* ── Auto-scroll to results ── */
+  window.onload = function() {
+    var results = document.getElementById('results');
+    if (results) {
+      setTimeout(function() {
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+  }
+</script>
+</body>
+</html>
